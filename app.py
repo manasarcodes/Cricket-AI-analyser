@@ -184,18 +184,40 @@ def set_custom_css():
 set_custom_css()
 
 # --- CONFIGURATION ---
-genai.configure(api_key="api_key")
+genai.configure(api_key="[ENCRYPTION_KEY]")
 model = genai.GenerativeModel('models/gemini-3-flash-preview')
 
 # --- DATA LOADING ---
 @st.cache_data
 def load_data():
-    path = r'F:\manasa-backup_21-07-2025\Downloads\archive.zip'
-    df = pd.read_csv(path, compression='zip', low_memory=False)
-    if 'Unnamed: 0' in df.columns:
-        df = df.drop(columns=['Unnamed: 0'])
-    return df
+    
+    try:
+        # 1. Attempt to load the file
+        df = pd.read_csv('cricket_data_trimmed.csv')
+        
+        # 2. Check if the dataframe is empty
+        if df.empty:
+            st.error("The dataset file is empty.")
+            return None
 
+        # 3. Defensive check: Does 'season' exist?
+        if 'season' in df.columns:
+            df['season'] = pd.to_numeric(df['season'], errors='coerce')
+        else:
+            st.warning("Column 'season' not found in the dataset.")
+
+        # 4. Cleanup
+        if 'Unnamed: 0' in df.columns:
+            df = df.drop(columns=['Unnamed: 0'])
+            
+        return df
+        
+    except FileNotFoundError:
+        st.error("Error: 'cricket_data_trimmed.csv' not found in the project folder.")
+        return None
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
+        return None
 df = load_data()
 
 st.markdown("""
