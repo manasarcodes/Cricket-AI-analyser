@@ -180,11 +180,12 @@ def set_custom_css():
     }
     </style>
     """, unsafe_allow_html=True)
+    
 
 set_custom_css()
 
 # --- CONFIGURATION ---
-genai.configure(api_key="[ENCRYPTION_KEY]")
+genai.configure(api_key=st.secrets["gemini_api"])
 model = genai.GenerativeModel('models/gemini-3-flash-preview')
 
 # --- DATA LOADING ---
